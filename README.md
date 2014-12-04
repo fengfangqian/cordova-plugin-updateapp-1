@@ -3,6 +3,10 @@
 ================
 #### 备注: by mbyte 优化R.String 依赖
 
+把：import com.simpleevent.xattender.R;
+   换成自己的包名；
+   或者把用到的 R.string  直接在UpdateApp.java 里定义，这样不依赖于 string.xml 文件了；
+
 
 基于cordova插件形式开发的版本升级插件，支持android和iOS。
 
