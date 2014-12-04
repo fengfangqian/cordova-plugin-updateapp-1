@@ -1,4 +1,4 @@
-﻿package com.phonegap.plugins.updateapp;
+package com.phonegap.plugins.updateapp;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -38,27 +38,27 @@ import android.widget.ProgressBar;
 
 public class UpdateApp extends CordovaPlugin {
 
-	/*版本号检查路径*/
+    /* 版本号检查路径 */
     private String checkPath;
-    /*新版本号*/
+    /* 新版本号 */
     private int newVerCode;
-    /*新版本名称*/
+    /* 新版本名称 */
     private String newVerName;
-    /*APK 下载路径*/
+    /* APK 下载路径 */
     private String downloadPath;
-    /*下载中*/
+    /* 下载中 */
     private static final int DOWNLOAD = 1;
-    /*下载结束*/
+    /* 下载结束 */
     private static final int DOWNLOAD_FINISH = 2;
-    /*下载保存路径*/
+    /* 下载保存路径 */
     private String mSavePath;
-    /*记录进度条数量*/
+    /* 记录进度条数量 */
     private int progress;
-    /*是否取消更新*/
+    /* 是否取消更新 */
     private boolean cancelUpdate = false;
-    /*上下文*/
+    /* 上下文 */
     private Context mContext;
-    /*更新进度条*/
+    /* 更新进度条 */
     private ProgressBar mProgress;
     private Dialog mDownloadDialog;
 
