@@ -16,7 +16,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.simpleevent.xattender.R;
+//import com.simpleevent.xattender.R;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -63,6 +63,26 @@ public class UpdateApp extends CordovaPlugin {
     private Dialog mDownloadDialog;
 
     protected static final String LOG_TAG = "UpdateApp";
+    
+    
+    private String soft_update_no="已经是最新版本";
+    private String soft_update_title="软件更新";
+    private String soft_update_info="检测到新版本，立即更新吗？";
+    private String soft_update_updatebtn="更新";
+    private String soft_update_later="稍后更新";
+    private String soft_updating="正在更新";
+    private String soft_update_cancel="取消";
+    
+//    <string name="soft_update_no">已经是最新版本</string>
+//    <string name="soft_update_title">软件更新</string>
+//    <string name="soft_update_info">检测到新版本，立即更新吗？</string>
+//    <string name="soft_update_updatebtn">更新</string>
+//    <string name="soft_update_later">稍后更新</string>
+//    <string name="soft_updating">正在更新</string>
+//    <string name="soft_update_cancel">取消</string>
+    
+    
+    
 
     @Override
     public boolean execute(String action, JSONArray args,
@@ -172,10 +192,10 @@ public class UpdateApp extends CordovaPlugin {
             public void run() {
                 // 构造对话框
                 AlertDialog.Builder builder = new Builder(mContext);
-                builder.setTitle(R.string.soft_update_title);
-                builder.setMessage(R.string.soft_update_info);
+                builder.setTitle(soft_update_title);
+                builder.setMessage(soft_update_info);
                 // 更新
-                builder.setPositiveButton(R.string.soft_update_updatebtn,
+                builder.setPositiveButton(soft_update_updatebtn,
                         new OnClickListener() {
                             public void onClick(DialogInterface dialog,
                                     int which) {
@@ -185,7 +205,7 @@ public class UpdateApp extends CordovaPlugin {
                             }
                         });
                 // 稍后更新
-                builder.setNegativeButton(R.string.soft_update_later,
+                builder.setNegativeButton(soft_update_later,
                         new OnClickListener() {
                             public void onClick(DialogInterface dialog,
                                     int which) {
@@ -205,14 +225,14 @@ public class UpdateApp extends CordovaPlugin {
     private void showDownloadDialog() {
         // 构造软件下载对话框
         AlertDialog.Builder builder = new Builder(mContext);
-        builder.setTitle(R.string.soft_updating);
+        builder.setTitle(soft_updating);
         // 给下载对话框增加进度条
         final LayoutInflater inflater = LayoutInflater.from(mContext);
         View v = inflater.inflate(R.layout.softupdate_progress, null);
         mProgress = (ProgressBar) v.findViewById(R.id.update_progress);
         builder.setView(v);
         // 取消更新
-        builder.setNegativeButton(R.string.soft_update_cancel,
+        builder.setNegativeButton(soft_update_cancel,
                 new OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
