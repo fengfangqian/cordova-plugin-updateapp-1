@@ -9,6 +9,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Locale;
+import java.util.Map;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -18,6 +20,10 @@ import org.json.JSONObject;
 
 import com.simpleevent.xattender.R;
 
+import android.content.res.AssetManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
@@ -25,16 +31,21 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ProgressBar;
-
 
 public class UpdateApp extends CordovaPlugin {
 
@@ -63,38 +74,103 @@ public class UpdateApp extends CordovaPlugin {
     private Dialog mDownloadDialog;
 
     protected static final String LOG_TAG = "UpdateApp";
-    
-    
-    private String soft_update_no="已经是最新版本";
-    private String soft_update_title="软件更新";
-    private String soft_update_info="检测到新版本，立即更新吗？";
-    private String soft_update_updatebtn="更新";
-    private String soft_update_later="稍后更新";
-    private String soft_updating="正在更新";
-    private String soft_update_cancel="取消";
-    
-//    <string name="soft_update_no">已经是最新版本</string>
-//    <string name="soft_update_title">软件更新</string>
-//    <string name="soft_update_info">检测到新版本，立即更新吗？</string>
-//    <string name="soft_update_updatebtn">更新</string>
-//    <string name="soft_update_later">稍后更新</string>
-//    <string name="soft_updating">正在更新</string>
-//    <string name="soft_update_cancel">取消</string>
-    
+
+    private Resources resources; // 资源
+    private Configuration config; // 配置
+    private DisplayMetrics dm; // 屏幕
+    private SharedPreferences setting; // 存储
+    private Editor editor; // 存储编辑器
+
+    private String soft_update_no = "已经是最新版本";
+    private String soft_update_title = "软件更新";
+    private String soft_update_info = "检测到新版本，立即更新吗？";
+    private String soft_update_updatebtn = "更新";
+    private String soft_update_later = "稍后更新";
+    private String soft_updating = "正在更新";
+    private String soft_update_cancel = "取消";
+
+    private JSONObject jsonObj = null;
+    private String fileName = ""; // 多语言文件路径
+
+    // <string name="soft_update_no">已经是最新版本</string>
+    // <string name="soft_update_title">软件更新</string>
+    // <string name="soft_update_info">检测到新版本，立即更新吗？</string>
+    // <string name="soft_update_updatebtn">更新</string>
+    // <string name="soft_update_later">稍后更新</string>
+    // <string name="soft_updating">正在更新</string>
+    // <string name="soft_update_cancel">取消</string>
 
     @Override
     public boolean execute(String action, JSONArray args,
             final CallbackContext callbackContext) throws JSONException {
         this.mContext = cordova.getActivity();
+
+        JSONArray arr = args.getJSONArray(0);
+
+        this.checkPath = arr.getString(0);
+        String curLanguage = arr.getString(1);
+        setLanguage(curLanguage);
+
+        // String fileName = "res-plugin/updateapp/values-zh-rCN/string.json";
+        String strJson = getJson(fileName);
+        Log.i("strJson  >>>  ", strJson);
+        jsonObj = new JSONObject(strJson);
+
+        Log.d("", jsonObj.getString("soft_update_title"));
+
+        // try {
+        // AssetManager am = mContext.getResources().getAssets();
+        // //InputStream is =
+        // am.open("res-plugin/updatexx/values-zh-rCN/string.json");
+        // InputStream inputStream =
+        // mContext.getResources().getAssets().open("res-plugin/updatexx/values-zh-rCN/string.json");
+        // InputStreamReader inputStreamReader = new
+        // InputStreamReader(inputStream, "UTF-8");
+        // BufferedReader bufferedReader = new
+        // BufferedReader(inputStreamReader);
+        // String info = "";
+        // while ((info = bufferedReader.readLine()) != null) {
+        // Log.i("fff", info);
+        // //Toast.makeText(MainActivity.this, info, 1000).show();
+        // }
+        // //mContext.getAssets().open("sample.txt");
+        // }catch (IOException e) {
+        // // TODO Auto-generated catch block
+        // e.printStackTrace();
+        // }
+        //
+        // InputStream in =
+        // mContext.getResources().openRawResource(R.raw.enstrings);
+        //
+        // BufferedReader br = new BufferedReader(new InputStreamReader(in));
+        // String str = null;
+        // try {
+        // while ((str = br.readLine()) != null) {
+        // Log.e("str >>>>>>> ", str);
+        // }
+        // in.close();
+        // br.close();
+        // } catch (IOException e) {
+        // e.printStackTrace();
+        // }
+        //
+
+        // getResources().getString(R.string.value);
+        // resources = mContext.getResources();
+
+        // String ss =
+        // mContext.getResources().getString(R.string.soft_update_info);
+        // Log.e("ss >>>> ", ss);
+
         if ("checkAndUpdate".equals(action)) {
-            this.checkPath = args.getString(0);
+            // this.checkPath = args.getString(0);
             checkAndUpdate();
             return true;
         } else if ("getCurrentVersion".equals(action)) {
             callbackContext.success(this.getCurrentVerCode() + "");
             return true;
         } else if ("getServerVersion".equals(action)) {
-            this.checkPath = args.getString(0);
+            // this.checkPath = args.getString(0);
             cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
                     if (getServerVerInfo()) {
@@ -108,6 +184,94 @@ public class UpdateApp extends CordovaPlugin {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 读取本地文件中JSON字符串
+     * 
+     * @param fileName
+     * @return
+     */
+    private String getJson(String mFileName) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        AssetManager am = mContext.getResources().getAssets();
+        String info = "";
+        try {
+            // InputStream is =
+            // am.open("res-plugin/updatexx/values-zh-rCN/string.json");
+            // InputStream inputStream =
+            // mContext.getResources().getAssets().open("res-plugin/updateapp/values-zh-rCN/string.json");
+
+            InputStream inputStream = mContext.getResources().getAssets()
+                    .open(mFileName);
+            InputStreamReader inputStreamReader = new InputStreamReader(
+                    inputStream, "UTF-8");
+            BufferedReader bufferedReader = new BufferedReader(
+                    inputStreamReader);
+            String line;
+            while ((info = bufferedReader.readLine()) != null) {
+                Log.i("fff", info);
+                // Toast.makeText(MainActivity.this, info, 1000).show();
+                stringBuilder.append(info);
+            }
+            // mContext.getAssets().open("sample.txt");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return stringBuilder.toString();
+        // return info.toString();
+    }
+
+    /**
+     * 2 * 将JSON字符串转化为Adapter数据 3 * 4 * @param str 5
+     */
+    private void setData(String str) {
+        try {
+            JSONArray array = new JSONArray(str);
+            int len = array.length();
+            Map<String, String> map;
+            for (int i = 0; i < len; i++) {
+                JSONObject object = array.getJSONObject(i);
+                // map = new HashMap<String, String>();
+                // map.put("operator", object.getString("operator"));
+                // map.put("loginDate", object.getString("loginDate"));
+                // map.put("logoutDate", object.getString("logoutDate"));
+                // data.add(map);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setLanguage(String curLanguage) {
+        resources = this.mContext.getResources();// 获得res资源对象
+        config = resources.getConfiguration();// 获得设置对象
+        dm = resources.getDisplayMetrics();// 获得屏幕参数：主要是分辨率，像素等。
+
+        // setting = getSharedPreferences("setting", Activity.MODE_PRIVATE); //
+        // 得到存储
+        // editor = setting.edit(); // 得到存储编辑器
+        // int language = setting.getInt("language", 1); // 获得存储内容，并给默认值(默认英语)
+
+        if (curLanguage.equals("zh-Hans")) {
+            config.locale = Locale.SIMPLIFIED_CHINESE;
+            resources.updateConfiguration(config, dm);
+
+            fileName = "res-plugin/updateapp/values-zh-rCN/string.json";
+        } else if (curLanguage.equals("en-US")) {
+            config.locale = Locale.ENGLISH;
+            resources.updateConfiguration(config, dm);
+            fileName = "res-plugin/updateapp/values/string.json";
+
+        } else {
+            config.locale = Locale.SIMPLIFIED_CHINESE;
+            resources.updateConfiguration(config, dm);
+            fileName = "res-plugin/updateapp/values-zh-rCN/string.json";
+        }
+        Log.e(" 当前使用语言>>>> ", curLanguage);
+
     }
 
     /**
@@ -190,28 +354,36 @@ public class UpdateApp extends CordovaPlugin {
             public void run() {
                 // 构造对话框
                 AlertDialog.Builder builder = new Builder(mContext);
-                builder.setTitle(R.string.soft_update_title);
-                builder.setMessage(R.string.soft_update_info);
-                // 更新
-                builder.setPositiveButton(R.string.soft_update_updatebtn,
-                        new OnClickListener() {
-                            public void onClick(DialogInterface dialog,
-                                    int which) {
-                                dialog.dismiss();
-                                // 显示下载对话框
-                                showDownloadDialog();
-                            }
-                        });
-                // 稍后更新
-                builder.setNegativeButton(R.string.soft_update_later,
-                        new OnClickListener() {
-                            public void onClick(DialogInterface dialog,
-                                    int which) {
-                                dialog.dismiss();
-                            }
-                        });
-                Dialog noticeDialog = builder.create();
-                noticeDialog.show();
+                try {
+                    builder.setTitle(jsonObj.getString("soft_update_title"));
+                    builder.setMessage(jsonObj.getString("soft_update_info"));
+
+                    // 更新
+                    builder.setPositiveButton(
+                            jsonObj.getString("soft_update_updatebtn"),
+                            new OnClickListener() {
+                                public void onClick(DialogInterface dialog,
+                                        int which) {
+                                    dialog.dismiss();
+                                    // 显示下载对话框
+                                    showDownloadDialog();
+                                }
+                            });
+                    // 稍后更新
+                    builder.setNegativeButton(
+                            jsonObj.getString("soft_update_later"),
+                            new OnClickListener() {
+                                public void onClick(DialogInterface dialog,
+                                        int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    Dialog noticeDialog = builder.create();
+                    noticeDialog.show();
+                } catch (JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         };
         this.cordova.getActivity().runOnUiThread(runnable);
@@ -221,27 +393,33 @@ public class UpdateApp extends CordovaPlugin {
      * 显示软件下载对话框
      */
     private void showDownloadDialog() {
-        // 构造软件下载对话框
-        AlertDialog.Builder builder = new Builder(mContext);
-        builder.setTitle(R.string.soft_updating);
-        // 给下载对话框增加进度条
-        final LayoutInflater inflater = LayoutInflater.from(mContext);
-        View v = inflater.inflate(R.layout.softupdate_progress, null);
-        mProgress = (ProgressBar) v.findViewById(R.id.update_progress);
-        builder.setView(v);
-        // 取消更新
-        builder.setNegativeButton(R.string.soft_update_cancel,
-                new OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        // 设置取消状态
-                        cancelUpdate = true;
-                    }
-                });
-        mDownloadDialog = builder.create();
-        mDownloadDialog.show();
-        // 现在文件
-        downloadApk();
+        try {
+            // 构造软件下载对话框
+            AlertDialog.Builder builder = new Builder(mContext);
+            builder.setTitle(jsonObj.getString("soft_updating"));
+
+            // 给下载对话框增加进度条
+            final LayoutInflater inflater = LayoutInflater.from(mContext);
+            View v = inflater.inflate(R.layout.softupdate_progress, null);
+            mProgress = (ProgressBar) v.findViewById(R.id.update_progress);
+            builder.setView(v);
+            // 取消更新
+            builder.setNegativeButton(jsonObj.getString("soft_update_cancel"),
+                    new OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            // 设置取消状态
+                            cancelUpdate = true;
+                        }
+                    });
+            mDownloadDialog = builder.create();
+            mDownloadDialog.show();
+            // 现在文件
+            downloadApk();
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -345,7 +523,7 @@ public class UpdateApp extends CordovaPlugin {
         }
         // 通过Intent安装APK文件
         Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         i.setDataAndType(Uri.parse("file://" + apkfile.toString()),
                 "application/vnd.android.package-archive");
         mContext.startActivity(i);
