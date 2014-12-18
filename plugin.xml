@@ -31,6 +31,7 @@
         <source-file src="src/android/updateapp/values-zh-rCN/string.json" target-dir="assets/res-plugin/updateapp/values-zh-rCN"/>
         <source-file src="src/android/updateapp/values-zh-rCN/strings.xml" target-dir="assets/res-plugin/updateapp/values-zh-rCN"/>
         <source-file src="src/android/updateapp/values/strings.xml" target-dir="assets/res-plugin/updateapp/values"/>
+        <source-file src="src/android/updateapp/values/string.json" target-dir="assets/res-plugin/updateapp/values"/>
 
 
 <!--         <source-file src="src/android/res/values-zh-rCN/strings.xml" target-dir="res/values-zh-rCN"/>
