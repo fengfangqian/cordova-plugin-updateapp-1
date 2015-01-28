@@ -1,4 +1,4 @@
-/*
+ï»¿/*
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
  distributed with this work for additional information
@@ -18,8 +18,10 @@
  */
 
 
-CFBundleDisplayName = "Ò×»á";
 
 
 
-"titleInfo"="ÓĞĞÂµÄ°æ±¾£¬ÊÇ·ñÇ°Íù¸üĞÂ£¿123";
+CFBundleDisplayName = "æ˜“ä¼š";
+
+
+"titleInfo"="æœ‰æ–°çš„ç‰ˆæœ¬ï¼Œæ˜¯å¦å‰å¾€æ›´æ–°ï¼Ÿ";

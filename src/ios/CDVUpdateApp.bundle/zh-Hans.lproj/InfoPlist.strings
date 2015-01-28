@@ -1,4 +1,4 @@
-/* 
+﻿/* 
   InfoPlist.strings
   Smart Event
 
@@ -9,4 +9,4 @@
 
 CFBundleDisplayName = "易会";
 
-"titleInfo"="有新的版本，是否前往更新？123";
+"titleInfo"="有新的版本，是否前往更新？";
